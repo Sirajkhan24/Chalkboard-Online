@@ -234,7 +234,11 @@
 
       <div class="h-5 w-[1px] bg-zinc-700/60 mx-0.5"></div>
 
-      <!-- Export Actions -->
+      <!-- Copy & Export Actions -->
+      <button id="btn-copy-image" title="Copy entire image to clipboard" class="bg-indigo-700 hover:bg-indigo-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-copy"></i>
+        <span>Copy</span>
+      </button>
       <button id="btn-export-png" title="Save image as PNG" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition shadow flex items-center gap-1.5">
         <i class="fa-solid fa-download"></i>
         <span>PNG</span>
@@ -345,7 +349,7 @@
       <!-- Opacity -->
       <div class="flex items-center space-x-2">
         <span class="text-xs text-zinc-400 font-medium">Opacity:</span>
-        <input type="range" id="opacitySlider" min="10" max="100" value="90" class="w-16 sm:w-20">
+        <input type="range" id="opacitySlider" min="10" max="100" value="100" class="w-16 sm:w-20">
       </div>
       
       <!-- Visual Circle Indicator Preview -->
@@ -481,7 +485,7 @@
       tool: 'chalk', // 'chalk', 'smooth', 'highlighter', 'spray', 'calligraphy', 'crayon', 'eraser', 'line', 'arrow', 'rect', 'circle'
       color: '#ffffff',
       size: 12,
-      opacity: 0.9,
+      opacity: 1.0, // Default opacity set to maximum (100%)
       
       // Background Settings
       bgPreset: 'slate', // 'slate', 'green', 'grid', 'lined', 'charcoal', 'solid', 'custom'
@@ -1296,6 +1300,31 @@
 
       return exportCanvas;
     }
+
+    // Copy whole merged image to clipboard
+    document.getElementById('btn-copy-image').addEventListener('click', async () => {
+      try {
+        const merged = getMergedCanvas();
+        merged.toBlob(async (blob) => {
+          if (!blob) {
+            showToast('Failed to generate image', 'fa-circle-exclamation');
+            return;
+          }
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            showToast('Image copied to clipboard!', 'fa-copy');
+          } catch (err) {
+            console.error(err);
+            showToast('Clipboard copy failed / unsupported browser', 'fa-circle-exclamation');
+          }
+        }, 'image/png');
+      } catch (err) {
+        console.error(err);
+        showToast('Failed to copy image', 'fa-circle-exclamation');
+      }
+    });
 
     // Save as PNG
     document.getElementById('btn-export-png').addEventListener('click', () => {
