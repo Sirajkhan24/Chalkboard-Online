@@ -1,0 +1,1267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="icon" type="image/svg+xml" href="icon.svg">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- Primary Search SEO -->
+  <title>Chalkboard Online – Free Virtual Blackboard Drawing Tool (No Sign Up)</title>
+  <meta name="title" content="Chalkboard Online – Free Virtual Blackboard Drawing Tool (No Sign Up)">
+  <meta name="description" content="Draw online instantly with a realistic virtual chalkboard. Features chalk texture brushes, custom background uploads, eraser, and PNG/PDF exports. 100% free with no account required.">
+  <meta name="keywords" content="chalkboard online, free virtual blackboard, draw online no sign up, free drawing board, online slate board, virtual chalkboard canvas, interactive whiteboard free">
+  <meta name="robots" content="index, follow">
+  <meta name="author" content="Siraj Khan">
+
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://sirajkhan24.github.io/Chalkboard-Online/">
+
+  <!-- Social Media Previews (Open Graph) -->
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://sirajkhan24.github.io/Chalkboard-Online/">
+  <meta property="og:title" content="Chalkboard Online – Free Digital Blackboard & Chalk Slate">
+  <meta property="og:description" content="Instant online chalkboard drawing app with custom chalk brush, eraser, background uploads, and PDF export. Free with no account required.">
+  <meta property="og:image" content="https://sirajkhan24.github.io/Chalkboard-Online/preview.png">
+
+  <!-- Twitter Card -->
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://sirajkhan24.github.io/Chalkboard-Online/">
+  <meta property="twitter:title" content="Chalkboard Online – Free Virtual Blackboard Drawing Tool">
+  <meta property="twitter:description" content="Draw online instantly on a digital blackboard. Realistic chalk feel, eraser, custom image backgrounds, and PNG/PDF export.">
+  <meta property="twitter:image" content="https://sirajkhan24.github.io/Chalkboard-Online/preview.png">
+
+  <!-- Google Schema Markup -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebApplication",
+    "name": "Chalkboard Online",
+    "url": "https://sirajkhan24.github.io/Chalkboard-Online/",
+    "description": "A free web application featuring a realistic virtual blackboard for drawing, teaching, and sketching. Supports custom background uploads, brush tools, eraser, and PNG/PDF export.",
+    "applicationCategory": "EducationalApplication",
+    "operatingSystem": "All",
+    "browserRequirements": "Requires JavaScript and HTML5 Canvas",
+    "offers": {
+      "@type": "Offer",
+      "price": "0",
+      "priceCurrency": "USD"
+    }
+  }
+  </script>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Patrick+Hand&family=Permanent+Marker&display=swap" rel="stylesheet">
+
+  <!-- jsPDF CDN for PDF Exporting -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #0b0d0c;
+      touch-action: none;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    
+    .font-chalk {
+      font-family: 'Patrick Hand', 'Permanent Marker', cursive;
+    }
+
+    /* Wooden Border Outer Frame */
+    .wood-frame {
+      background: linear-gradient(135deg, #3d2215 0%, #29150b 50%, #1a0c06 100%);
+      box-shadow: 
+        inset 0 0 18px rgba(0,0,0,0.92),
+        0 20px 45px rgba(0,0,0,0.8),
+        0 2px 8px rgba(0,0,0,0.6);
+      border: 1px solid #542f1a;
+    }
+
+    .wood-inner-bevel {
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.95);
+    }
+
+    /* Glassmorphism Control Panels */
+    .glass-panel {
+      background: rgba(18, 22, 20, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    /* Interactive Tool Buttons */
+    .tool-btn {
+      transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tool-btn:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+    .tool-btn.active {
+      background-color: rgba(255, 255, 255, 0.22);
+      border-color: rgba(255, 255, 255, 0.65);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 14px rgba(0,0,0,0.5);
+    }
+
+    /* Preset Chip Button */
+    .preset-btn {
+      transition: all 0.15s ease;
+      border: 2px solid transparent;
+    }
+    .preset-btn.active {
+      border-color: #38bdf8;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Color Swatch Selection */
+    .color-swatch {
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .color-swatch:hover {
+      transform: scale(1.15);
+    }
+    .color-swatch.active {
+      transform: scale(1.25);
+      box-shadow: 0 0 0 2px #ffffff, 0 0 12px rgba(255,255,255,0.7);
+    }
+
+    /* Custom Input Range Styling */
+    input[type=range] {
+      -webkit-appearance: none;
+      background: transparent;
+    }
+    input[type=range]:focus {
+      outline: none;
+    }
+    input[type=range]::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 6px;
+      cursor: pointer;
+      background: rgba(255, 255, 255, 0.22);
+      border-radius: 3px;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #ffffff;
+      cursor: pointer;
+      -webkit-appearance: none;
+      margin-top: -6px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    /* Toast Notification Animation */
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .toast-anim {
+      animation: toastIn 0.2s ease-out forwards;
+    }
+
+    /* Custom scrollbars for menus */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+  </style>
+</head>
+<body class="h-screen w-screen flex flex-col justify-between p-2 sm:p-3 relative">
+
+  <header class="w-full flex items-center justify-between px-3 sm:px-4 py-2 glass-panel rounded-xl z-20 shadow-xl">
+    <div class="flex items-center space-x-3">
+      <div class="w-9 h-9 rounded-lg bg-emerald-950 border border-emerald-500/40 flex items-center justify-center text-amber-200 text-lg shadow-inner">
+        <i class="fa-solid fa-chalkboard"></i>
+      </div>
+      <div>
+        <h1 class="text-white text-sm sm:text-base font-semibold tracking-wide flex items-center gap-2">
+          Studio Slate
+          <span class="text-[10px] sm:text-xs font-normal px-2 py-0.5 bg-emerald-900/70 text-emerald-300 rounded-full border border-emerald-700/50">Pro 2.0</span>
+        </h1>
+        <p class="text-[11px] text-zinc-400 hidden sm:block">Chalkboard & Custom Background Studio</p>
+      </div>
+    </div>
+
+    <!-- Header Tools & Modals Trigger -->
+    <div class="flex items-center space-x-1 sm:space-x-2">
+      <!-- Background Settings Modal Trigger -->
+      <button id="btn-open-bg-modal" class="bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-white/15 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-image text-amber-300"></i>
+        <span>Background</span>
+      </button>
+
+      <div class="h-5 w-[1px] bg-zinc-700/60 mx-0.5"></div>
+
+      <!-- Undo / Redo -->
+      <button id="btn-undo" title="Undo (Ctrl+Z)" disabled class="p-2 text-zinc-300 hover:text-white hover:bg-white/10 rounded-lg transition text-xs sm:text-sm disabled:opacity-30 disabled:cursor-not-allowed">
+        <i class="fa-solid fa-rotate-left"></i>
+        <span class="hidden md:inline ml-1">Undo</span>
+      </button>
+      <button id="btn-redo" title="Redo (Ctrl+Y)" disabled class="p-2 text-zinc-300 hover:text-white hover:bg-white/10 rounded-lg transition text-xs sm:text-sm disabled:opacity-30 disabled:cursor-not-allowed">
+        <i class="fa-solid fa-rotate-right"></i>
+        <span class="hidden md:inline ml-1">Redo</span>
+      </button>
+
+      <div class="h-5 w-[1px] bg-zinc-700/60 mx-0.5"></div>
+
+      <!-- Clear Board -->
+      <button id="btn-clear" title="Clear Blackboard (C)" class="p-2 text-rose-300 hover:text-rose-100 hover:bg-rose-900/40 border border-rose-500/20 rounded-lg transition text-xs sm:text-sm flex items-center gap-1">
+        <i class="fa-solid fa-broom"></i>
+        <span class="hidden sm:inline">Clear</span>
+      </button>
+
+      <div class="h-5 w-[1px] bg-zinc-700/60 mx-0.5"></div>
+
+      <!-- Export Actions -->
+      <button id="btn-export-png" title="Save image as PNG" class="bg-emerald-700 hover:bg-emerald-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-download"></i>
+        <span>PNG</span>
+      </button>
+      <button id="btn-export-pdf" title="Export document as PDF" class="bg-amber-700 hover:bg-amber-600 text-white px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition shadow flex items-center gap-1.5">
+        <i class="fa-solid fa-file-pdf"></i>
+        <span>PDF</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="flex-1 w-full relative flex items-center justify-center my-2 min-h-0">
+    <div class="wood-frame w-full h-full rounded-2xl p-2.5 sm:p-4 flex items-center justify-center relative overflow-hidden">
+      <!-- Wooden Inner Bevel Frame Edge -->
+      <div id="boardContainer" class="wood-inner-bevel w-full h-full rounded-xl overflow-hidden relative flex items-center justify-center bg-zinc-950">
+        
+        <!-- Canvas Layer 0: Background Texture, Custom Image & Grid presets -->
+        <canvas id="bgCanvas" class="absolute inset-0 w-full h-full pointer-events-none z-0"></canvas>
+
+        <!-- Canvas Layer 1: Interactive Drawing Layer -->
+        <canvas id="drawCanvas" class="absolute inset-0 w-full h-full cursor-crosshair z-10 touch-none"></canvas>
+
+        <!-- Brush & Eraser Hover Preview Ring -->
+        <div id="brushCursor" class="pointer-events-none fixed rounded-full border border-white/70 bg-white/10 hidden -translate-x-1/2 -translate-y-1/2 z-30 transition-transform duration-75"></div>
+      </div>
+
+      <!-- Wooden Chalk Tray Decorative Overlay -->
+      <div class="absolute bottom-1 left-16 right-16 h-2 bg-gradient-to-r from-amber-950 via-amber-900 to-amber-950 rounded-t border-t border-amber-800/40 shadow-lg pointer-events-none hidden sm:block"></div>
+    </div>
+  </main>
+
+  <footer class="w-full glass-panel rounded-xl p-2 sm:p-2.5 z-20 flex flex-col md:flex-row items-center justify-between gap-2 text-white">
+    
+    <!-- Drawing Tools -->
+    <div class="flex items-center justify-between w-full md:w-auto overflow-x-auto">
+      <div class="flex items-center space-x-1 bg-black/40 p-1 rounded-xl border border-white/10">
+        <button id="tool-chalk" class="tool-btn active px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Chalk Brush (B)">
+          <i class="fa-solid fa-pencil text-amber-200"></i>
+          <span>Chalk</span>
+        </button>
+        <button id="tool-smooth" class="tool-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Solid Marker">
+          <i class="fa-solid fa-pen-nib text-cyan-300"></i>
+          <span>Solid</span>
+        </button>
+        <button id="tool-eraser" class="tool-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Felt Eraser (E)">
+          <i class="fa-solid fa-eraser text-pink-300"></i>
+          <span>Eraser</span>
+        </button>
+        <button id="tool-line" class="tool-btn px-2 sm:px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Straight Line">
+          <i class="fa-solid fa-minus text-blue-300"></i>
+          <span class="hidden sm:inline">Line</span>
+        </button>
+        <button id="tool-arrow" class="tool-btn px-2 sm:px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Arrow">
+          <i class="fa-solid fa-arrow-right text-amber-300"></i>
+          <span class="hidden sm:inline">Arrow</span>
+        </button>
+        <button id="tool-rect" class="tool-btn px-2 sm:px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Rectangle">
+          <i class="fa-regular fa-square text-emerald-300"></i>
+          <span class="hidden sm:inline">Rect</span>
+        </button>
+        <button id="tool-circle" class="tool-btn px-2 sm:px-2.5 py-1.5 rounded-lg text-xs sm:text-sm font-medium flex items-center gap-1.5 text-zinc-100" title="Circle">
+          <i class="fa-regular fa-circle text-purple-300"></i>
+          <span class="hidden sm:inline">Circle</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Chalk Palette Swatches -->
+    <div id="paletteContainer" class="flex items-center space-x-2 overflow-x-auto max-w-full py-0.5">
+      <span class="text-xs text-zinc-400 font-medium hidden lg:inline mr-1">Color:</span>
+      <div class="flex items-center space-x-2" id="chalkSwatches">
+        <!-- Injected dynamically in JS -->
+      </div>
+
+      <!-- Custom Color Picker -->
+      <div class="relative flex items-center ml-1 shrink-0" title="Pick custom chalk color">
+        <input type="color" id="customColorPicker" value="#ffffff" class="opacity-0 absolute inset-0 w-7 h-7 cursor-pointer z-10" />
+        <div class="w-7 h-7 rounded-full border border-white/40 bg-gradient-to-tr from-indigo-500 via-pink-500 to-amber-300 flex items-center justify-center text-[10px] text-white shadow pointer-events-none">
+          <i class="fa-solid fa-palette"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Size & Opacity Controls -->
+    <div class="flex items-center space-x-3 w-full md:w-auto justify-end shrink-0">
+      <!-- Size -->
+      <div class="flex items-center space-x-2">
+        <span class="text-xs text-zinc-400 font-medium">Size:</span>
+        <input type="range" id="sizeSlider" min="2" max="100" value="12" class="w-20 sm:w-28">
+      </div>
+
+      <!-- Opacity -->
+      <div class="flex items-center space-x-2">
+        <span class="text-xs text-zinc-400 font-medium">Opacity:</span>
+        <input type="range" id="opacitySlider" min="10" max="100" value="90" class="w-16 sm:w-20">
+      </div>
+      
+      <!-- Visual Circle Indicator Preview -->
+      <div class="w-8 h-8 rounded-lg bg-black/50 border border-white/10 flex items-center justify-center shrink-0">
+        <div id="sizePreviewDot" class="rounded-full bg-white transition-all duration-75"></div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Background Settings Modal -->
+  <div id="bgModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+    <div class="glass-panel p-5 sm:p-6 rounded-2xl max-w-lg w-full mx-4 border border-white/15 shadow-2xl text-left max-h-[90vh] overflow-y-auto">
+      
+      <div class="flex items-center justify-between pb-3 border-b border-white/10 mb-4">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-image text-amber-300 text-lg"></i>
+          <h3 class="text-white text-base sm:text-lg font-semibold">Blackboard & Custom Background</h3>
+        </div>
+        <button id="btn-close-bg-modal" class="text-zinc-400 hover:text-white p-1 text-lg">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Preset Options Grid -->
+      <div class="mb-5">
+        <label class="block text-xs font-medium text-zinc-300 mb-2">Preset Blackboard Surfaces:</label>
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="presetContainer">
+          <button data-preset="slate" class="preset-btn active bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-[#18201d] border border-white/20 shrink-0"></span>
+            <span class="text-xs text-zinc-200 font-medium">Classic Slate</span>
+          </button>
+          <button data-preset="green" class="preset-btn bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-[#1a3323] border border-white/20 shrink-0"></span>
+            <span class="text-xs text-zinc-200 font-medium">Vintage Green</span>
+          </button>
+          <button data-preset="grid" class="preset-btn bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-[#1e293b] border border-cyan-500/40 shrink-0 flex items-center justify-center text-[9px] text-cyan-300"><i class="fa-solid fa-table-cells"></i></span>
+            <span class="text-xs text-zinc-200 font-medium">Math Grid</span>
+          </button>
+          <button data-preset="lined" class="preset-btn bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-[#18201d] border border-amber-500/40 shrink-0 flex items-center justify-center text-[9px] text-amber-300"><i class="fa-solid fa-grip-lines"></i></span>
+            <span class="text-xs text-zinc-200 font-medium">Lined Slate</span>
+          </button>
+          <button data-preset="charcoal" class="preset-btn bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <span class="w-5 h-5 rounded-full bg-[#121214] border border-white/20 shrink-0"></span>
+            <span class="text-xs text-zinc-200 font-medium">Dark Charcoal</span>
+          </button>
+          <button data-preset="solid" class="preset-btn bg-zinc-900 p-2.5 rounded-xl text-left border border-white/10 hover:bg-zinc-800 flex items-center space-x-2">
+            <input type="color" id="presetSolidPicker" value="#1c2522" class="w-5 h-5 rounded-full p-0 border-0 cursor-pointer shrink-0" />
+            <span class="text-xs text-zinc-200 font-medium">Solid Color</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom Image Upload Section -->
+      <div class="p-3 bg-black/40 rounded-xl border border-white/10 mb-5">
+        <label class="block text-xs font-semibold text-amber-300 mb-1">
+          <i class="fa-solid fa-upload mr-1"></i> Upload Custom Background Image:
+        </label>
+        <p class="text-[11px] text-zinc-400 mb-3">Upload your own photo, diagram, template, or image (JPG, PNG, WebP, SVG).</p>
+
+        <div class="flex items-center gap-2">
+          <input type="file" id="bgFileInput" accept="image/*" class="hidden" />
+          <button id="btn-trigger-upload" class="bg-amber-600 hover:bg-amber-500 text-white text-xs px-3 py-2 rounded-lg font-medium transition flex items-center gap-1.5 shadow">
+            <i class="fa-solid fa-folder-open"></i> Choose Image File
+          </button>
+          <span id="bgFileName" class="text-xs text-zinc-400 truncate flex-1">No file selected</span>
+        </div>
+
+        <!-- Custom Image Controls (Active when image uploaded) -->
+        <div id="customImageControls" class="mt-4 border-t border-white/10 pt-3 space-y-3 hidden">
+          <div>
+            <label class="block text-xs text-zinc-300 font-medium mb-1">Image Fit Mode:</label>
+            <div class="grid grid-cols-4 gap-1.5">
+              <button data-fit="cover" class="fit-btn active bg-zinc-800 py-1 text-xs rounded text-zinc-200 border border-white/10">Cover</button>
+              <button data-fit="contain" class="fit-btn bg-zinc-800 py-1 text-xs rounded text-zinc-200 border border-white/10">Contain</button>
+              <button data-fit="stretch" class="fit-btn bg-zinc-800 py-1 text-xs rounded text-zinc-200 border border-white/10">Stretch</button>
+              <button data-fit="tile" class="fit-btn bg-zinc-800 py-1 text-xs rounded text-zinc-200 border border-white/10">Tile</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between text-xs text-zinc-300 mb-1">
+              <span>Darkening Tint Overlay (for chalk visibility):</span>
+              <span id="tintVal">40%</span>
+            </div>
+            <input type="range" id="bgTintSlider" min="0" max="90" value="40" class="w-full">
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Footer Buttons -->
+      <div class="flex items-center justify-between pt-2 border-t border-white/10">
+        <button id="btn-reset-bg" class="text-rose-400 hover:text-rose-300 text-xs font-medium flex items-center gap-1">
+          <i class="fa-solid fa-rotate-left"></i> Reset to Default Board
+        </button>
+        <button id="btn-apply-bg" class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium px-4 py-2 rounded-xl shadow transition">
+          Done
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Clear Modal -->
+  <div id="clearModal" class="fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-200">
+    <div class="glass-panel p-5 sm:p-6 rounded-2xl max-w-xs sm:max-w-sm w-full mx-4 border border-white/15 shadow-2xl text-center">
+      <div class="w-12 h-12 rounded-full bg-rose-900/50 border border-rose-500/30 text-rose-300 text-xl flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-broom"></i>
+      </div>
+      <h3 class="text-white text-lg font-semibold mb-1">Dust Blackboard Clean?</h3>
+      <p class="text-zinc-300 text-xs sm:text-sm mb-5">This action will clear all current drawings from the board.</p>
+      <div class="flex items-center space-x-3">
+        <button id="btn-cancel-clear" class="flex-1 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs sm:text-sm font-medium border border-white/10 transition">
+          Cancel
+        </button>
+        <button id="btn-confirm-clear" class="flex-1 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs sm:text-sm font-semibold shadow transition">
+          Clear Board
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast" class="fixed top-16 left-1/2 -translate-x-1/2 bg-zinc-800/90 text-white border border-white/20 text-xs sm:text-sm px-4 py-2 rounded-full shadow-2xl pointer-events-none z-50 hidden toast-anim flex items-center gap-2">
+    <i id="toastIcon" class="fa-solid fa-circle-info text-emerald-400"></i>
+    <span id="toastMsg">Action complete</span>
+  </div>
+
+  <script>
+    // Main Application State
+    const STATE = {
+      tool: 'chalk', // 'chalk', 'smooth', 'eraser', 'line', 'arrow', 'rect', 'circle'
+      color: '#ffffff',
+      size: 12,
+      opacity: 0.9,
+      
+      // Background Settings
+      bgPreset: 'slate', // 'slate', 'green', 'grid', 'lined', 'charcoal', 'solid', 'custom'
+      solidBgColor: '#1c2522',
+      customImage: null,
+      customImageName: '',
+      bgFit: 'cover', // 'cover', 'contain', 'stretch', 'tile'
+      bgTintOpacity: 0.4, // Darkening overlay for custom image
+
+      // Drawing Interactions
+      isDrawing: false,
+      startX: 0,
+      startY: 0,
+      lastX: 0,
+      lastY: 0,
+
+      // History Undo/Redo
+      history: [],
+      redoStack: [],
+      maxHistory: 30
+    };
+
+    // Preset traditional chalk palette
+    const PALETTE_COLORS = [
+      { name: 'Pure White', hex: '#ffffff' },
+      { name: 'Dust Yellow', hex: '#fef08a' },
+      { name: 'Soft Cyan', hex: '#a5f3fc' },
+      { name: 'Chalk Pink', hex: '#fbcfe8' },
+      { name: 'Mint Green', hex: '#bbf7d0' },
+      { name: 'Pastel Orange', hex: '#fed7aa' },
+      { name: 'Soft Violet', hex: '#e9d5ff' }
+    ];
+
+    // DOM Elements Reference
+    const boardContainer = document.getElementById('boardContainer');
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const drawCtx = drawCanvas.getContext('2d');
+    const brushCursor = document.getElementById('brushCursor');
+    const sizeSlider = document.getElementById('sizeSlider');
+    const opacitySlider = document.getElementById('opacitySlider');
+    const sizePreviewDot = document.getElementById('sizePreviewDot');
+    const customColorPicker = document.getElementById('customColorPicker');
+    
+    const btnUndo = document.getElementById('btn-undo');
+    const btnRedo = document.getElementById('btn-redo');
+
+    // Temp Offscreen Canvas for Rendering Interactive Shape Drag Previews
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+
+    function initCanvasDimensions() {
+      const rect = boardContainer.getBoundingClientRect();
+      const dpr = window.devicePixelRatio || 1;
+
+      // Preserve existing drawing contents across viewport resize
+      let savedData = null;
+      if (drawCanvas.width > 0 && drawCanvas.height > 0) {
+        savedData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+      }
+
+      // Set internal pixel size to DPR for ultra-sharp canvas
+      bgCanvas.width = rect.width * dpr;
+      bgCanvas.height = rect.height * dpr;
+      drawCanvas.width = rect.width * dpr;
+      drawCanvas.height = rect.height * dpr;
+      tempCanvas.width = rect.width * dpr;
+      tempCanvas.height = rect.height * dpr;
+
+      // Scale context
+      bgCtx.scale(dpr, dpr);
+      drawCtx.scale(dpr, dpr);
+      tempCtx.scale(dpr, dpr);
+
+      // Render background board or custom image
+      renderBackground();
+
+      // Restore drawing pixels
+      if (savedData) {
+        drawCtx.putImageData(savedData, 0, 0);
+      }
+    }
+
+    // Render the blackboard texture, grid pattern, solid color or uploaded custom image
+    function renderBackground() {
+      const width = bgCanvas.width / (window.devicePixelRatio || 1);
+      const height = bgCanvas.height / (window.devicePixelRatio || 1);
+
+      bgCtx.clearRect(0, 0, width, height);
+
+      // 1. CUSTOM UPLOADED IMAGE BACKGROUND
+      if (STATE.bgPreset === 'custom' && STATE.customImage) {
+        const img = STATE.customImage;
+        bgCtx.save();
+
+        if (STATE.bgFit === 'stretch') {
+          bgCtx.drawImage(img, 0, 0, width, height);
+        } else if (STATE.bgFit === 'cover') {
+          const imgRatio = img.width / img.height;
+          const canvasRatio = width / height;
+          let renderW, renderH, offsetX, offsetY;
+
+          if (canvasRatio > imgRatio) {
+            renderW = width;
+            renderH = width / imgRatio;
+            offsetX = 0;
+            offsetY = (height - renderH) / 2;
+          } else {
+            renderH = height;
+            renderW = height * imgRatio;
+            offsetX = (width - renderW) / 2;
+            offsetY = 0;
+          }
+          bgCtx.drawImage(img, offsetX, offsetY, renderW, renderH);
+        } else if (STATE.bgFit === 'contain') {
+          const imgRatio = img.width / img.height;
+          const canvasRatio = width / height;
+          let renderW, renderH, offsetX, offsetY;
+
+          if (canvasRatio > imgRatio) {
+            renderH = height;
+            renderW = height * imgRatio;
+            offsetX = (width - renderW) / 2;
+            offsetY = 0;
+          } else {
+            renderW = width;
+            renderH = width / imgRatio;
+            offsetX = 0;
+            offsetY = (height - renderH) / 2;
+          }
+          // Fill dark backing for empty contain borders
+          bgCtx.fillStyle = '#0f1110';
+          bgCtx.fillRect(0, 0, width, height);
+          bgCtx.drawImage(img, offsetX, offsetY, renderW, renderH);
+        } else if (STATE.bgFit === 'tile') {
+          const pattern = bgCtx.createPattern(img, 'repeat');
+          bgCtx.fillStyle = pattern;
+          bgCtx.fillRect(0, 0, width, height);
+        }
+        bgCtx.restore();
+
+        // Apply Darkening Tint Overlay so white/light chalk drawing remains readable
+        if (STATE.bgTintOpacity > 0) {
+          bgCtx.fillStyle = `rgba(0, 0, 0, ${STATE.bgTintOpacity})`;
+          bgCtx.fillRect(0, 0, width, height);
+        }
+        return;
+      }
+
+      // 2. PRESET BLACKBOARD SURFACES
+      let baseColor = '#18201d';
+      let vignetteColor = '#0d1310';
+
+      if (STATE.bgPreset === 'green') {
+        baseColor = '#1a3323';
+        vignetteColor = '#0c1b11';
+      } else if (STATE.bgPreset === 'charcoal') {
+        baseColor = '#121214';
+        vignetteColor = '#080809';
+      } else if (STATE.bgPreset === 'solid') {
+        baseColor = STATE.solidBgColor;
+        vignetteColor = STATE.solidBgColor;
+      }
+
+      // Base fill
+      bgCtx.fillStyle = baseColor;
+      bgCtx.fillRect(0, 0, width, height);
+
+      // Vignette effect (skip for pure solid)
+      if (STATE.bgPreset !== 'solid') {
+        const gradient = bgCtx.createRadialGradient(
+          width / 2, height / 2, Math.min(width, height) * 0.3,
+          width / 2, height / 2, Math.max(width, height) * 0.85
+        );
+        gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+        gradient.addColorStop(1, vignetteColor);
+        bgCtx.fillStyle = gradient;
+        bgCtx.fillRect(0, 0, width, height);
+      }
+
+      // Grid / Line Overlay for educational boards
+      if (STATE.bgPreset === 'grid') {
+        bgCtx.save();
+        bgCtx.strokeStyle = 'rgba(56, 189, 248, 0.15)';
+        bgCtx.lineWidth = 1;
+        const gridSize = 32;
+        for (let x = 0; x < width; x += gridSize) {
+          bgCtx.beginPath();
+          bgCtx.moveTo(x, 0);
+          bgCtx.lineTo(x, height);
+          bgCtx.stroke();
+        }
+        for (let y = 0; y < height; y += gridSize) {
+          bgCtx.beginPath();
+          bgCtx.moveTo(0, y);
+          bgCtx.lineTo(width, y);
+          bgCtx.stroke();
+        }
+        bgCtx.restore();
+      } else if (STATE.bgPreset === 'lined') {
+        bgCtx.save();
+        bgCtx.strokeStyle = 'rgba(251, 191, 36, 0.18)';
+        bgCtx.lineWidth = 1;
+        const lineSpacing = 36;
+        for (let y = lineSpacing; y < height; y += lineSpacing) {
+          bgCtx.beginPath();
+          bgCtx.moveTo(0, y);
+          bgCtx.lineTo(width, y);
+          bgCtx.stroke();
+        }
+        bgCtx.restore();
+      }
+
+      // Add microscopic noise for slate texture realism
+      if (['slate', 'green', 'charcoal', 'grid', 'lined'].includes(STATE.bgPreset)) {
+        const imgData = bgCtx.getImageData(0, 0, bgCanvas.width, bgCanvas.height);
+        const data = imgData.data;
+        for (let i = 0; i < data.length; i += 4) {
+          const noise = (Math.random() - 0.5) * 10;
+          data[i] = Math.min(255, Math.max(0, data[i] + noise));
+          data[i+1] = Math.min(255, Math.max(0, data[i+1] + noise));
+          data[i+2] = Math.min(255, Math.max(0, data[i+2] + noise));
+        }
+        bgCtx.putImageData(imgData, 0, 0);
+
+        // Subtle chalk dust corner smudges
+        bgCtx.save();
+        bgCtx.globalAlpha = 0.025;
+        bgCtx.fillStyle = '#ffffff';
+        for (let i = 0; i < 12; i++) {
+          const rx = Math.random() * width;
+          const ry = Math.random() * height;
+          const radius = Math.random() * 140 + 40;
+          bgCtx.beginPath();
+          bgCtx.arc(rx, ry, radius, 0, Math.PI * 2);
+          bgCtx.fill();
+        }
+        bgCtx.restore();
+      }
+    }
+
+    function renderPalette() {
+      const container = document.getElementById('chalkSwatches');
+      container.innerHTML = '';
+
+      PALETTE_COLORS.forEach(item => {
+        const btn = document.createElement('button');
+        btn.className = `color-swatch w-7 h-7 rounded-full border border-white/20 shadow-md ${STATE.color === item.hex ? 'active' : ''}`;
+        btn.style.backgroundColor = item.hex;
+        btn.title = item.name;
+        btn.addEventListener('click', () => {
+          setColor(item.hex);
+        });
+        container.appendChild(btn);
+      });
+    }
+
+    function setColor(hex) {
+      STATE.color = hex;
+      if (STATE.tool === 'eraser') {
+        setTool('chalk');
+      }
+      renderPalette();
+      updateSizePreview();
+    }
+
+    function updateSizePreview() {
+      const size = STATE.size;
+      sizePreviewDot.style.width = `${Math.min(28, Math.max(4, size * 0.45))}px`;
+      sizePreviewDot.style.height = `${Math.min(28, Math.max(4, size * 0.45))}px`;
+      sizePreviewDot.style.backgroundColor = STATE.tool === 'eraser' ? '#f472b6' : STATE.color;
+      sizePreviewDot.style.opacity = STATE.opacity;
+
+      brushCursor.style.width = `${size}px`;
+      brushCursor.style.height = `${size}px`;
+    }
+
+    sizeSlider.addEventListener('input', (e) => {
+      STATE.size = parseInt(e.target.value, 10);
+      updateSizePreview();
+    });
+
+    opacitySlider.addEventListener('input', (e) => {
+      STATE.opacity = parseInt(e.target.value, 10) / 100;
+      updateSizePreview();
+    });
+
+    // Chalk texture particle drawing algorithm
+    function drawChalkSegment(ctx, x1, y1, x2, y2, colorHex, radius, pressure = 1, opacity = 1) {
+      const dist = Math.hypot(x2 - x1, y2 - y1);
+      const steps = Math.max(1, Math.ceil(dist / 1.5));
+      const effectiveRadius = radius * (0.35 + pressure * 0.65);
+
+      ctx.save();
+      ctx.fillStyle = colorHex;
+
+      for (let i = 0; i < steps; i++) {
+        const t = i / steps;
+        const cx = x1 + (x2 - x1) * t;
+        const cy = y1 + (y2 - y1) * t;
+        
+        // Particle count based on brush thickness
+        const particleCount = Math.max(6, Math.floor(effectiveRadius * 1.8));
+        
+        for (let p = 0; p < particleCount; p++) {
+          const r = (Math.random() * 0.85 + Math.random() * 0.15) * effectiveRadius;
+          const theta = Math.random() * Math.PI * 2;
+          const px = cx + r * Math.cos(theta);
+          const py = cy + r * Math.sin(theta);
+          
+          const pSize = Math.random() * 1.8 + 0.6;
+          const particleAlpha = (Math.random() * 0.45 + 0.15) * opacity * (1 - (r / (effectiveRadius + 1)) * 0.45);
+          
+          ctx.globalAlpha = particleAlpha;
+          ctx.fillRect(px, py, pSize, pSize);
+        }
+      }
+      ctx.restore();
+    }
+
+    // Smooth solid stroke drawing
+    function drawSmoothSegment(ctx, x1, y1, x2, y2, colorHex, radius, pressure = 1, opacity = 1) {
+      ctx.save();
+      ctx.strokeStyle = colorHex;
+      ctx.lineWidth = radius * 2 * (0.4 + pressure * 0.6);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = opacity;
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Erasing segment
+    function eraseSegment(ctx, x1, y1, x2, y2, radius, pressure = 1) {
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = radius * 2 * (0.4 + pressure * 0.6);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawShapePreview(ctx, x1, y1, x2, y2, tool, colorHex, radius, opacity) {
+      ctx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      ctx.save();
+      ctx.strokeStyle = colorHex;
+      ctx.fillStyle = colorHex;
+      ctx.lineWidth = radius;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.globalAlpha = opacity;
+
+      if (tool === 'line') {
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      } else if (tool === 'arrow') {
+        const headlen = Math.max(12, radius * 2.5);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(x2, y2);
+        ctx.lineTo(x2 - headlen * Math.cos(angle - Math.PI / 6), y2 - headlen * Math.sin(angle - Math.PI / 6));
+        ctx.lineTo(x2 - headlen * Math.cos(angle + Math.PI / 6), y2 - headlen * Math.sin(angle + Math.PI / 6));
+        ctx.closePath();
+        ctx.fill();
+      } else if (tool === 'rect') {
+        const w = x2 - x1;
+        const h = y2 - y1;
+        ctx.strokeRect(x1, y1, w, h);
+      } else if (tool === 'circle') {
+        const rx = Math.abs(x2 - x1) / 2;
+        const ry = Math.abs(y2 - y1) / 2;
+        const cx = Math.min(x1, x2) + rx;
+        const cy = Math.min(y1, y2) + ry;
+        ctx.beginPath();
+        ctx.ellipse(cx, cy, rx, ry, 0, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    // Helper for canvas pointer position calculation
+    function getPointerPos(e) {
+      const rect = drawCanvas.getBoundingClientRect();
+      return {
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top,
+        pressure: e.pressure && e.pressure > 0 ? e.pressure : 0.85
+      };
+    }
+
+    function handlePointerDown(e) {
+      e.preventDefault();
+      STATE.isDrawing = true;
+      const pos = getPointerPos(e);
+      STATE.startX = pos.x;
+      STATE.startY = pos.y;
+      STATE.lastX = pos.x;
+      STATE.lastY = pos.y;
+
+      saveState(); // Record state snapshot for undo history
+
+      if (STATE.tool === 'chalk') {
+        drawChalkSegment(drawCtx, pos.x, pos.y, pos.x, pos.y, STATE.color, STATE.size / 2, pos.pressure, STATE.opacity);
+      } else if (STATE.tool === 'smooth') {
+        drawSmoothSegment(drawCtx, pos.x, pos.y, pos.x, pos.y, STATE.color, STATE.size / 2, pos.pressure, STATE.opacity);
+      } else if (STATE.tool === 'eraser') {
+        eraseSegment(drawCtx, pos.x, pos.y, pos.x, pos.y, STATE.size / 2, pos.pressure);
+      }
+    }
+
+    function handlePointerMove(e) {
+      const pos = getPointerPos(e);
+
+      // Position Hover Cursor Indicator
+      brushCursor.style.left = `${e.clientX}px`;
+      brushCursor.style.top = `${e.clientY}px`;
+      brushCursor.classList.remove('hidden');
+
+      if (!STATE.isDrawing) return;
+
+      if (STATE.tool === 'chalk') {
+        drawChalkSegment(drawCtx, STATE.lastX, STATE.lastY, pos.x, pos.y, STATE.color, STATE.size / 2, pos.pressure, STATE.opacity);
+        STATE.lastX = pos.x;
+        STATE.lastY = pos.y;
+      } else if (STATE.tool === 'smooth') {
+        drawSmoothSegment(drawCtx, STATE.lastX, STATE.lastY, pos.x, pos.y, STATE.color, STATE.size / 2, pos.pressure, STATE.opacity);
+        STATE.lastX = pos.x;
+        STATE.lastY = pos.y;
+      } else if (STATE.tool === 'eraser') {
+        eraseSegment(drawCtx, STATE.lastX, STATE.lastY, pos.x, pos.y, STATE.size / 2, pos.pressure);
+        STATE.lastX = pos.x;
+        STATE.lastY = pos.y;
+      } else if (['line', 'arrow', 'rect', 'circle'].includes(STATE.tool)) {
+        drawShapePreview(tempCtx, STATE.startX, STATE.startY, pos.x, pos.y, STATE.tool, STATE.color, STATE.size, STATE.opacity);
+        
+        // Restore last clean state and render temporary shape on top
+        if (STATE.history.length > 0) {
+          drawCtx.putImageData(STATE.history[STATE.history.length - 1], 0, 0);
+        } else {
+          drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+        }
+        drawCtx.drawImage(tempCanvas, 0, 0, drawCanvas.width / (window.devicePixelRatio || 1), drawCanvas.height / (window.devicePixelRatio || 1));
+      }
+    }
+
+    function handlePointerUp() {
+      if (!STATE.isDrawing) return;
+      STATE.isDrawing = false;
+      tempCtx.clearRect(0, 0, tempCanvas.width, tempCanvas.height);
+      STATE.redoStack = []; // Reset redo stack on new action
+      updateUndoRedoUI();
+    }
+
+    function handlePointerLeave() {
+      brushCursor.classList.add('hidden');
+      if (STATE.isDrawing) {
+        handlePointerUp();
+      }
+    }
+
+    drawCanvas.addEventListener('pointerdown', handlePointerDown);
+    drawCanvas.addEventListener('pointermove', handlePointerMove);
+    drawCanvas.addEventListener('pointerup', handlePointerUp);
+    drawCanvas.addEventListener('pointerleave', handlePointerLeave);
+
+    function saveState() {
+      if (STATE.history.length >= STATE.maxHistory) {
+        STATE.history.shift();
+      }
+      const imgData = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+      STATE.history.push(imgData);
+      updateUndoRedoUI();
+    }
+
+    function undo() {
+      if (STATE.history.length === 0) return;
+      const current = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+      STATE.redoStack.push(current);
+
+      const previous = STATE.history.pop();
+      drawCtx.putImageData(previous, 0, 0);
+      updateUndoRedoUI();
+      showToast('Undo performed', 'fa-rotate-left');
+    }
+
+    function redo() {
+      if (STATE.redoStack.length === 0) return;
+      const current = drawCtx.getImageData(0, 0, drawCanvas.width, drawCanvas.height);
+      STATE.history.push(current);
+
+      const next = STATE.redoStack.pop();
+      drawCtx.putImageData(next, 0, 0);
+      updateUndoRedoUI();
+      showToast('Redo performed', 'fa-rotate-right');
+    }
+
+    function updateUndoRedoUI() {
+      btnUndo.disabled = STATE.history.length === 0;
+      btnRedo.disabled = STATE.redoStack.length === 0;
+    }
+
+    btnUndo.addEventListener('click', undo);
+    btnRedo.addEventListener('click', redo);
+
+    function setTool(toolName) {
+      STATE.tool = toolName;
+      document.querySelectorAll('.tool-btn').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      const activeBtn = document.getElementById(`tool-${toolName}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      updateSizePreview();
+    }
+
+    ['chalk', 'smooth', 'eraser', 'line', 'arrow', 'rect', 'circle'].forEach(t => {
+      const btn = document.getElementById(`tool-${t}`);
+      if (btn) btn.addEventListener('click', () => setTool(t));
+    });
+
+    const bgModal = document.getElementById('bgModal');
+    const btnOpenBgModal = document.getElementById('btn-open-bg-modal');
+    const btnCloseBgModal = document.getElementById('btn-close-bg-modal');
+    const btnApplyBg = document.getElementById('btn-apply-bg');
+    const btnResetBg = document.getElementById('btn-reset-bg');
+    
+    const bgFileInput = document.getElementById('bgFileInput');
+    const btnTriggerUpload = document.getElementById('btn-trigger-upload');
+    const bgFileName = document.getElementById('bgFileName');
+    const customImageControls = document.getElementById('customImageControls');
+    const bgTintSlider = document.getElementById('bgTintSlider');
+    const tintVal = document.getElementById('tintVal');
+    const presetSolidPicker = document.getElementById('presetSolidPicker');
+
+    btnOpenBgModal.addEventListener('click', () => {
+      bgModal.classList.remove('hidden');
+      setTimeout(() => bgModal.classList.remove('opacity-0'), 10);
+    });
+
+    function closeBgModal() {
+      bgModal.classList.add('opacity-0');
+      setTimeout(() => bgModal.classList.add('hidden'), 200);
+    }
+
+    btnCloseBgModal.addEventListener('click', closeBgModal);
+    btnApplyBg.addEventListener('click', closeBgModal);
+
+    // Preset Chip Buttons Selection
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const preset = btn.dataset.preset;
+        if (!preset) return;
+
+        document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        STATE.bgPreset = preset;
+        if (preset === 'solid') {
+          STATE.solidBgColor = presetSolidPicker.value;
+        }
+
+        renderBackground();
+        showToast(`Background: ${preset.toUpperCase()}`, 'fa-image');
+      });
+    });
+
+    presetSolidPicker.addEventListener('input', (e) => {
+      STATE.solidBgColor = e.target.value;
+      STATE.bgPreset = 'solid';
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-preset="solid"]').classList.add('active');
+      renderBackground();
+    });
+
+    // Custom Image File Upload
+    btnTriggerUpload.addEventListener('click', () => bgFileInput.click());
+
+    bgFileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+          STATE.customImage = img;
+          STATE.customImageName = file.name;
+          STATE.bgPreset = 'custom';
+
+          bgFileName.textContent = file.name;
+          customImageControls.classList.remove('hidden');
+
+          document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+
+          renderBackground();
+          showToast('Custom background loaded!', 'fa-cloud-arrow-up');
+        };
+        img.src = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    // Image Fit Buttons
+    document.querySelectorAll('.fit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.fit-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        STATE.bgFit = btn.dataset.fit;
+        renderBackground();
+      });
+    });
+
+    // Darkening Tint Slider
+    bgTintSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      STATE.bgTintOpacity = val / 100;
+      tintVal.textContent = `${val}%`;
+      renderBackground();
+    });
+
+    // Reset Background to default
+    btnResetBg.addEventListener('click', () => {
+      STATE.bgPreset = 'slate';
+      STATE.customImage = null;
+      STATE.customImageName = '';
+      bgFileName.textContent = 'No file selected';
+      customImageControls.classList.add('hidden');
+
+      document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('[data-preset="slate"]').classList.add('active');
+
+      renderBackground();
+      showToast('Reset to default slate board', 'fa-rotate-left');
+    });
+
+    const clearModal = document.getElementById('clearModal');
+    const btnClear = document.getElementById('btn-clear');
+    const btnCancelClear = document.getElementById('btn-cancel-clear');
+    const btnConfirmClear = document.getElementById('btn-confirm-clear');
+
+    btnClear.addEventListener('click', () => {
+      clearModal.classList.remove('hidden');
+      setTimeout(() => clearModal.classList.remove('opacity-0'), 10);
+    });
+
+    function closeClearModal() {
+      clearModal.classList.add('opacity-0');
+      setTimeout(() => clearModal.classList.add('hidden'), 200);
+    }
+
+    btnCancelClear.addEventListener('click', closeClearModal);
+
+    btnConfirmClear.addEventListener('click', () => {
+      saveState();
+      drawCtx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+      closeClearModal();
+      showToast('Board wiped clean', 'fa-broom');
+    });
+
+    // Merge background and drawing canvas into single canvas for export
+    function getMergedCanvas() {
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = drawCanvas.width;
+      exportCanvas.height = drawCanvas.height;
+      const exportCtx = exportCanvas.getContext('2d');
+
+      // 1. Draw background
+      exportCtx.drawImage(bgCanvas, 0, 0);
+      // 2. Draw user chalk drawing layer
+      exportCtx.drawImage(drawCanvas, 0, 0);
+
+      return exportCanvas;
+    }
+
+    // Save as PNG
+    document.getElementById('btn-export-png').addEventListener('click', () => {
+      const merged = getMergedCanvas();
+      const link = document.createElement('a');
+      link.download = `blackboard-studio-${Date.now()}.png`;
+      link.href = merged.toDataURL('image/png');
+      link.click();
+      showToast('Exported PNG image', 'fa-file-image');
+    });
+
+    // Save as PDF using jsPDF
+    document.getElementById('btn-export-pdf').addEventListener('click', () => {
+      try {
+        const merged = getMergedCanvas();
+        const imgData = merged.toDataURL('image/jpeg', 0.94);
+        
+        const { jsPDF } = window.jspdf;
+        const orientation = merged.width >= merged.height ? 'landscape' : 'portrait';
+        const pdf = new jsPDF({
+          orientation: orientation,
+          unit: 'px',
+          format: [merged.width, merged.height]
+        });
+
+        pdf.addImage(imgData, 'JPEG', 0, 0, merged.width, merged.height);
+        pdf.save(`blackboard-studio-${Date.now()}.pdf`);
+        showToast('Exported PDF document', 'fa-file-pdf');
+      } catch (err) {
+        console.error(err);
+        showToast('PDF Export failed', 'fa-circle-exclamation');
+      }
+    });
+
+    customColorPicker.addEventListener('input', (e) => {
+      setColor(e.target.value);
+    });
+
+    // Keyboard Shortcuts
+    window.addEventListener('keydown', (e) => {
+      if (e.target.tagName === 'SELECT' || e.target.tagName === 'INPUT') return;
+
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        if (e.shiftKey) redo();
+        else undo();
+      } else if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        redo();
+      } else if (e.key.toLowerCase() === 'b') {
+        setTool('chalk');
+      } else if (e.key.toLowerCase() === 'e') {
+        setTool('eraser');
+      } else if (e.key.toLowerCase() === 'c') {
+        btnClear.click();
+      } else if (e.key === '[') {
+        STATE.size = Math.max(2, STATE.size - 2);
+        sizeSlider.value = STATE.size;
+        updateSizePreview();
+      } else if (e.key === ']') {
+        STATE.size = Math.min(100, STATE.size + 2);
+        sizeSlider.value = STATE.size;
+        updateSizePreview();
+      }
+    });
+
+    // Toast Notification System
+    let toastTimeout;
+    function showToast(msg, iconClass = 'fa-circle-info') {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      const toastIcon = document.getElementById('toastIcon');
+
+      toastMsg.textContent = msg;
+      toastIcon.className = `fa-solid ${iconClass} text-emerald-400`;
+
+      toast.classList.remove('hidden');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 2200);
+    }
+
+    // Initialization on window ready
+    window.addEventListener('DOMContentLoaded', () => {
+      initCanvasDimensions();
+      renderPalette();
+      updateSizePreview();
+    });
+
+    window.addEventListener('resize', () => {
+      initCanvasDimensions();
+    });
+  </script>
+  <!-- Hidden Indexable SEO Content for Google Search Engine Crawlers -->
+  <div style="display: none;" aria-hidden="true">
+    <h1>Chalkboard Online – Free Digital Blackboard & Chalk Slate</h1>
+    <p>Chalkboard Online is a free web-based virtual blackboard app for teachers, students, artists, and presenters. Draw online with realistic particle chalk textures, customizable brush sizes, shape tools, and felt erasers.</p>
+    <h2>Features</h2>
+    <ul>
+      <li>No Sign-Up Needed: Start drawing immediately without creating an account.</li>
+      <li>Custom Backgrounds: Upload custom images or choose preset slate, green, math grid, and lined boards.</li>
+      <li>Export to PNG & PDF: Save high-resolution images or PDF documents of your work.</li>
+      <li>Touch & Stylus Compatible: Smooth drawing support across desktops, tablets, and mobile devices.</li>
+    </ul>
+  </div>
+
+</body>
+</html>
+</body>
+</html>

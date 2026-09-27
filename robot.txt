@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://sirajkhan24.github.io/Chalkboard-Online/sitemap.xml
